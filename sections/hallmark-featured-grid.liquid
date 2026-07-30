@@ -1,0 +1,275 @@
+<style>
+  .hallmark-grid-container {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .hallmark-grid-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hallmark-grid-header h2 {
+    font-size: 32px;
+    color: #1e2d42;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+  }
+  .hallmark-grid-header p {
+    font-size: 16px;
+    color: #617083;
+    margin: 0;
+  }
+  .hallmark-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+  .hallmark-grid-card {
+    background: #ffffff;
+    border: 1px solid #e1e6eb;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+  }
+  .hallmark-grid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  .hallmark-card-image-wrap {
+    background: #fdfdfd;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 240px;
+  }
+  .hallmark-card-image-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .hallmark-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #e11b22; /* Classic Hallmark Red */
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+  .hallmark-card-info {
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    border-top: 1px solid #f0f3f6;
+  }
+  .hallmark-card-relation {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #8997a9;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .hallmark-card-title {
+    font-size: 16px;
+    color: #1e2d42;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    line-height: 1.4;
+    flex-grow: 1;
+  }
+  .hallmark-card-price-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+  .hallmark-price-current {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e2d42;
+  }
+  .hallmark-price-compare {
+    font-size: 14px;
+    text-decoration: line-through;
+    color: #8997a9;
+  }
+</style>
+
+<div class="hallmark-grid-container">
+  {% if section.settings.heading != blank or section.settings.subheading != blank %}
+    <div class="hallmark-grid-header">
+      {% if section.settings.heading != blank %}
+        <h2>{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p>{{ section.settings.subheading }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="hallmark-grid">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.card_link | default: '#' }}" class="hallmark-grid-card" {{ block.shopify_attributes }}>
+        
+        <!-- Image & Badge Container -->
+        <div class="hallmark-card-image-wrap">
+          {% if block.settings.badge_text != blank %}
+            <span class="hallmark-card-badge" style="background: {{ block.settings.badge_color }};">
+              {{ block.settings.badge_text }}
+            </span>
+          {% endif %}
+          
+          {% if block.settings.card_image != blank %}
+            {{ block.settings.card_image | image_url: width: 400 | image_tag: alt: block.settings.card_title }}
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endif %}
+        </div>
+
+        <!-- Product Card Information -->
+        <div class="hallmark-card-info">
+          {% if block.settings.relation_tag != blank %}
+            <span class="hallmark-card-relation">{{ block.settings.relation_tag }}</span>
+          {% endif %}
+          
+          <h3 class="hallmark-card-title">{{ block.settings.card_title }}</h3>
+          
+          <div class="hallmark-card-price-wrap">
+            <span class="hallmark-price-current">{{ block.settings.current_price }}</span>
+            {% if block.settings.compare_price != blank %}
+              <span class="hallmark-price-compare">{{ block.settings.compare_price }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hallmark Featured Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Celebrate in Style"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading",
+      "default": "Pop a little happiness and wonder in the post!"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "grid_card",
+      "name": "Featured Card / Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Card Image"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "default": "Personalised"
+        },
+        {
+          "type": "color",
+          "id": "badge_color",
+          "label": "Badge Background Color",
+          "default": "#e11b22"
+        },
+        {
+          "type": "text",
+          "id": "relation_tag",
+          "label": "Relationship / Category Tag",
+          "default": "FOR DAD"
+        },
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card Title",
+          "default": "Signature Paper Wonder 3D Pop Up Card"
+        },
+        {
+          "type": "text",
+          "id": "current_price",
+          "label": "Current Price",
+          "default": "From £3.79"
+        },
+        {
+          "type": "text",
+          "id": "compare_price",
+          "label": "Compare Price (Optional)"
+        },
+        {
+          "type": "url",
+          "id": "card_link",
+          "label": "Card Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hallmark Featured Grid",
+      "blocks": [
+        {
+          "type": "grid_card",
+          "settings": {
+            "relation_tag": "FOR MUM",
+            "card_title": "Floral Bouquet Pop Up Mother's Day Card",
+            "badge_text": "30% OFF",
+            "current_price": "£5.95",
+            "compare_price": "£8.50"
+          }
+        },
+        {
+          "type": "grid_card",
+          "settings": {
+            "relation_tag": "FOR DAD",
+            "card_title": "Star Wars™ Millennium Falcon Pop-Up Card",
+            "badge_text": "BEST SELLER",
+            "badge_color": "#1e2d42",
+            "current_price": "£6.99",
+            "compare_price": "£9.99"
+          }
+        },
+        {
+          "type": "grid_card",
+          "settings": {
+            "relation_tag": "PERSONALKEY",
+            "card_title": "Cute Snoopy Happy Birthday Card",
+            "badge_text": "NEW",
+            "badge_color": "#28a745",
+            "current_price": "£3.99"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

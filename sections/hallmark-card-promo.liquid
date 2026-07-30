@@ -1,0 +1,67 @@
+<div class="card-promo-section" style="padding: 40px; text-align: center; background-color: #f9f9f9; border: 1px solid #ddd;">
+  <h2>{{ section.settings.section_title }}</h2>
+  
+  <div style="max-width: 300px; margin: 0 auto; padding: 20px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    {% if section.settings.card_image != blank %}
+      {{ section.settings.card_image | image_url: width: 300 | image_tag: style: "width: 100%; height: auto;" }}
+    {% else %}
+      {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+    {% endif %}
+    
+    <h3 style="margin-top: 15px;">{{ section.settings.card_name }}</h3>
+    <p>{{ section.settings.card_description }}</p>
+    
+    {% if section.settings.button_link != blank %}
+      <a href="{{ section.settings.button_link }}" style="display: inline-block; padding: 10px 20px; background: #000; color: #fff; text-decoration: none; margin-top: 10px;">
+        {{ section.settings.button_text }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hallmark Card Promo",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Heading",
+      "default": "Celebrate Today"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "text",
+      "id": "card_name",
+      "label": "Card Title",
+      "default": "Happy Birthday Card"
+    },
+    {
+      "type": "richtext",
+      "id": "card_description",
+      "label": "Card Description",
+      "default": "<p>A perfect card for someone special.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hallmark Card Promo"
+    }
+  ]
+}
+{% endschema %}
