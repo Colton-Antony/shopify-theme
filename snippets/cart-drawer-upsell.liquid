@@ -1,0 +1,77 @@
+{% comment %}
+  Snippet: snippets/cart-drawer-upsell.liquid
+  Usage: Rendered inside sections/cart-drawer.liquid
+{% endcomment %}
+
+{%- assign upsell_product = settings.cart_drawer_upsell_product -%}
+
+{%- if upsell_product != blank and upsell_product.available -%}
+  {%- assign in_cart = false -%}
+  {%- for item in cart.items -%}
+    {%- if item.product_id == upsell_product.id -%}
+      {%- assign in_cart = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- unless in_cart -%}
+    <div class="cart-upsell-block" style="padding: 12px; margin: 12px 0; border: 1px dashed #cbd5e1; border-radius: 6px; background: #f8fafc;">
+      <div class="cart-upsell-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="cart-upsell-badge" style="font-size: 10px; text-transform: uppercase; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; font-weight: bold; color: #475569;">Popular Add-On</span>
+        <h4 style="margin: 0; font-size: 13px; font-weight: 600; color: #0f172a;">Complete Your Gift</h4>
+      </div>
+
+      <div class="cart-upsell-content" style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+        <img 
+          src="{{ upsell_product.featured_image | image_url: width: 120 }}" 
+          alt="{{ upsell_product.featured_image.alt | escape }}"
+          width="50"
+          height="50"
+          style="object-fit: cover; border-radius: 4px;"
+        >
+
+        <div class="cart-upsell-details" style="flex-grow: 1;">
+          <div style="font-weight: 600; font-size: 13px; color: #0f172a;">{{ upsell_product.title | escape }}</div>
+          <div style="font-size: 12px; color: #64748b;">{{ upsell_product.price | money }}</div>
+        </div>
+
+        <button 
+          type="button" 
+          class="button button--secondary"
+          style="padding: 6px 12px; min-height: auto; font-size: 12px; cursor: pointer;"
+          data-variant-id="{{ upsell_product.selected_or_first_available_variant.id }}"
+          onclick="addUpsellToCart(this)"
+        >
+          + Add
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function addUpsellToCart(button) {
+        const variantId = button.getAttribute('data-variant-id');
+        button.disabled = true;
+        button.innerText = 'Adding...';
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+        })
+        .then(response => response.json())
+        .then(() => {
+          if (window.CartDrawer) {
+            document.querySelector('cart-drawer')?.renderContents();
+          } else {
+            location.reload();
+          }
+        })
+        .catch(err => {
+          console.error('Upsell error:', err);
+          button.disabled = false;
+          button.innerText = '+ Add';
+        });
+      }
+    </script>
+  {%- endunless -%}
+{%- endif -%}
