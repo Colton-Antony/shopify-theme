@@ -40,38 +40,41 @@
           class="button button--secondary"
           style="padding: 6px 12px; min-height: auto; font-size: 12px; cursor: pointer;"
           data-variant-id="{{ upsell_product.selected_or_first_available_variant.id }}"
-          onclick="addUpsellToCart(this)"
-        >
+onclick="addUpsellToCart({{ upsell_product.first_available_variant.id }})"        >
           + Add
         </button>
       </div>
     </div>
 
     <script>
-      function addUpsellToCart(button) {
-        const variantId = button.getAttribute('data-variant-id');
-        button.disabled = true;
-        button.innerText = 'Adding...';
+  window.addUpsellToCart = function(variantId) {
+    if (!variantId) return;
 
-        fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
-        })
-        .then(response => response.json())
-        .then(() => {
-          if (window.CartDrawer) {
-            document.querySelector('cart-drawer')?.renderContents();
-          } else {
-            location.reload();
-          }
-        })
-        .catch(err => {
-          console.error('Upsell error:', err);
-          button.disabled = false;
-          button.innerText = '+ Add';
-        });
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        items: [{
+          id: variantId,
+          quantity: 1
+        }]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Re-render Dawn's cart drawer section dynamically
+      const cartDrawer = document.querySelector('cart-drawer');
+      if (cartDrawer) {
+        // Simple page reload or trigger section refresh
+        location.reload(); 
       }
-    </script>
+    })
+    .catch(error => {
+      console.error('Error adding upsell product:', error);
+    });
+  };
+</script>
   {%- endunless -%}
 {%- endif -%}
