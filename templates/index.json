@@ -63,11 +63,11 @@
       "name": "Hallmark Card Promo",
       "settings": {
         "section_title": "",
-        "card_image": "shopify://shop_images/gift_card.png",
-        "card_name": "Happy Birthday Card",
-        "card_description": "<p>A perfect card for someone special.</p>",
+        "card_image": "shopify://shop_images/BARN6P.jpg",
+        "card_name": "Jellycat Dog",
+        "card_description": "<p><br/>From newborn snuggles to adult desk companions, find your forever friend.<br/><br/></p>",
         "button_text": "Buy",
-        "button_link": "shopify://collections/jellycat"
+        "button_link": "shopify://products/jellycat-bailey-sloth-small"
       }
     }
   },
