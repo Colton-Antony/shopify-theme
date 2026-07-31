@@ -62,7 +62,7 @@
       "type": "hallmark-card-promo",
       "name": "Hallmark Card Promo",
       "settings": {
-        "section_title": "Jelly Cats \"The Perfect Gift for All Ages\"From newborn snuggles to adult desk companions, find your forever friend.",
+        "section_title": "",
         "card_image": "shopify://shop_images/gift_card.png",
         "card_name": "Happy Birthday Card",
         "card_description": "<p>A perfect card for someone special.</p>",
