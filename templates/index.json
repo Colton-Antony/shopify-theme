@@ -15,21 +15,21 @@
         "template--18309637636369__6a3bb789-ce10-45f5-ae67-e2063ef8c76b-168016437761699a6e-0": {
           "type": "heading",
           "settings": {
-            "heading": "Generated test data",
+            "heading": "Perfect Words for Every Moment",
             "heading_size": "h1"
           }
         },
         "template--18309637636369__6a3bb789-ce10-45f5-ae67-e2063ef8c76b-168016437761699a6e-1": {
           "type": "text",
           "settings": {
-            "text": "A theme and populated test store by Shopify to help you test commerce primitives.",
+            "text": "Discover unique, high-quality cards they’ll actually want to keep.",
             "text_style": "body"
           }
         },
         "template--18309637636369__6a3bb789-ce10-45f5-ae67-e2063ef8c76b-168016437761699a6e-2": {
           "type": "buttons",
           "settings": {
-            "button_label_1": "Shop products",
+            "button_label_1": "Explore Cards",
             "button_link_1": "shopify://collections/all",
             "button_style_secondary_1": false,
             "button_label_2": "",
@@ -45,7 +45,7 @@
       ],
       "custom_css": [],
       "settings": {
-        "image": "shopify://shop_images/theme_cover_image.jpg",
+        "image": "shopify://shop_images/cozy-lifestyle-photography-of-a-hand-holding-a-beautifully-illustrated-folded-paper-greeting-card-next-to-a-steaming-mug-of-tea-on-a-light-oak-wood-tabletops-soft-warm-ambient-morning.png",
         "image_overlay_opacity": 0,
         "image_height": "medium",
         "desktop_content_position": "middle-left",
