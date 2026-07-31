@@ -17,6 +17,7 @@
         "grid_card_hqJHgG": {
           "type": "grid_card",
           "settings": {
+            "card_image": "shopify://shop_images/floral-bouquet-pop-up-mothers-day-card.png",
             "badge_text": "30% OFF",
             "badge_color": "#e11b22",
             "relation_tag": "FOR MUM",
@@ -29,6 +30,7 @@
         "grid_card_wyEVRH": {
           "type": "grid_card",
           "settings": {
+            "card_image": "shopify://shop_images/star-wars-millennium-falcon-pop-up-card.png",
             "badge_text": "BEST SELLER",
             "badge_color": "#1e2d42",
             "relation_tag": "FOR DAD",
@@ -41,6 +43,7 @@
         "grid_card_HqLn4P": {
           "type": "grid_card",
           "settings": {
+            "card_image": "shopify://shop_images/cute-snoopy-happy-birthday-card.png",
             "badge_text": "NEW",
             "badge_color": "#28a745",
             "relation_tag": "PERSONALKEY",
