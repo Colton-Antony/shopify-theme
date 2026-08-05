@@ -1,6 +1,1065 @@
+{% doc %}
+  @prompt
+    Create a mega-menu navigation header section that displays grouped columns of links when hovering over top-level menu items. The design should match a Hallmark-style retail navigation with:
+    - A top announcement bar in red (#CC0000) with white text
+    - A white header with the store logo on the left and icons (account, favourites, basket) on the right
+    - A horizontal top-level navigation bar with items like Birthday, Cards, Gifts & Wrap, Ornaments, Offers
+    - On hover, each top-level item reveals a full-width dropdown panel with multiple columns of links grouped by category headings
+    - The selected/active nav item should have a soft pink/light red underline or highlight
+    - "Offers" item should appear in red to stand out
+    - Clean, minimal styling with clear typography and good spacing between columns
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-mega-menu-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #ffffff;
+  }
+
+  .ai-mega-menu-announcement-{{ ai_gen_id }} {
+    background-color: {{ block.settings.announcement_bg_color }};
+    color: {{ block.settings.announcement_text_color }};
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .ai-mega-menu-header-{{ ai_gen_id }} {
+    background-color: {{ block.settings.header_bg_color }};
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .ai-mega-menu-header-inner-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ai-mega-menu-logo-{{ ai_gen_id }} {
+    flex-shrink: 0;
+  }
+
+  .ai-mega-menu-logo-{{ ai_gen_id }} img {
+    height: {{ block.settings.logo_height }}px;
+    width: auto;
+    display: block;
+  }
+
+  .ai-mega-menu-logo-placeholder-{{ ai_gen_id }} {
+    height: {{ block.settings.logo_height }}px;
+    width: 120px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .ai-mega-menu-logo-placeholder-{{ ai_gen_id }} svg {
+    width: 80%;
+    height: 80%;
+  }
+
+  .ai-mega-menu-icons-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .ai-mega-menu-icon-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: {{ block.settings.icon_color }};
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    transition: color 0.2s ease;
+  }
+
+  .ai-mega-menu-icon-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.icon_hover_color }};
+  }
+
+  .ai-mega-menu-icon-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-mega-menu-nav-{{ ai_gen_id }} {
+    background-color: {{ block.settings.nav_bg_color }};
+    border-bottom: 1px solid #e5e5e5;
+    position: relative;
+  }
+
+  .ai-mega-menu-nav-inner-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .ai-mega-menu-nav-list-{{ ai_gen_id }} {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 32px;
+  }
+
+  .ai-mega-menu-nav-item-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-mega-menu-nav-link-{{ ai_gen_id }} {
+    display: block;
+    padding: 16px 0;
+    color: {{ block.settings.nav_text_color }};
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  .ai-mega-menu-nav-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.nav_hover_color }};
+  }
+
+  .ai-mega-menu-nav-link-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: {{ block.settings.nav_active_color }};
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .ai-mega-menu-nav-item-{{ ai_gen_id }}:hover .ai-mega-menu-nav-link-{{ ai_gen_id }}::after {
+    transform: scaleX(1);
+  }
+
+  .ai-mega-menu-nav-link-offers-{{ ai_gen_id }} {
+    color: {{ block.settings.offers_text_color }};
+  }
+
+  .ai-mega-menu-dropdown-{{ ai_gen_id }} {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-top: 1px solid #e5e5e5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    z-index: 999;
+  }
+
+  .ai-mega-menu-nav-item-{{ ai_gen_id }}:hover .ai-mega-menu-dropdown-{{ ai_gen_id }} {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-mega-menu-dropdown-inner-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.dropdown_columns }}, 1fr);
+    gap: 40px;
+  }
+
+  .ai-mega-menu-dropdown-column-{{ ai_gen_id }} {
+    min-width: 0;
+  }
+
+  .ai-mega-menu-dropdown-heading-{{ ai_gen_id }} {
+    font-size: 14px;
+    font-weight: 700;
+    color: {{ block.settings.dropdown_heading_color }};
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-mega-menu-dropdown-list-{{ ai_gen_id }} {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ai-mega-menu-dropdown-list-{{ ai_gen_id }} li {
+    margin-bottom: 12px;
+  }
+
+  .ai-mega-menu-dropdown-link-{{ ai_gen_id }} {
+    color: {{ block.settings.dropdown_link_color }};
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease;
+  }
+
+  .ai-mega-menu-dropdown-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.dropdown_link_hover_color }};
+  }
+
+  @media screen and (max-width: 990px) {
+    .ai-mega-menu-nav-list-{{ ai_gen_id }} {
+      gap: 16px;
+    }
+
+    .ai-mega-menu-nav-link-{{ ai_gen_id }} {
+      font-size: 14px;
+    }
+
+    .ai-mega-menu-dropdown-inner-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      padding: 24px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-mega-menu-nav-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-mega-menu-header-inner-{{ ai_gen_id }} {
+      padding: 12px 16px;
+    }
+
+    .ai-mega-menu-icons-{{ ai_gen_id }} {
+      gap: 16px;
+    }
+
+    .ai-mega-menu-icon-{{ ai_gen_id }} span {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<mega-menu-{{ ai_gen_id }} class="ai-mega-menu-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.show_announcement %}
+    <div class="ai-mega-menu-announcement-{{ ai_gen_id }}">
+      {{ block.settings.announcement_text }}
+    </div>
+  {% endif %}
+
+  <div class="ai-mega-menu-header-{{ ai_gen_id }}">
+    <div class="ai-mega-menu-header-inner-{{ ai_gen_id }}">
+      <div class="ai-mega-menu-logo-{{ ai_gen_id }}">
+        {% if block.settings.logo %}
+          <a href="/">
+            <img
+              src="{{ block.settings.logo | image_url: width: 400 }}"
+              alt="{{ shop.name }}"
+              width="{{ block.settings.logo.width }}"
+              height="{{ block.settings.logo.height }}"
+              loading="eager"
+            >
+          </a>
+        {% else %}
+          <div class="ai-mega-menu-logo-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ai-mega-menu-icons-{{ ai_gen_id }}">
+        <a href="/account" class="ai-mega-menu-icon-{{ ai_gen_id }}" aria-label="Account">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Account</span>
+        </a>
+
+        <button class="ai-mega-menu-icon-{{ ai_gen_id }}" aria-label="Favourites">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span>Favourites</span>
+        </button>
+
+        <a href="/cart" class="ai-mega-menu-icon-{{ ai_gen_id }}" aria-label="Basket">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Basket</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="ai-mega-menu-nav-{{ ai_gen_id }}">
+    <div class="ai-mega-menu-nav-inner-{{ ai_gen_id }}">
+      <ul class="ai-mega-menu-nav-list-{{ ai_gen_id }}">
+        {% for i in (1..5) %}
+          {% liquid
+            assign nav_enabled_key = 'nav_' | append: i | append: '_enabled'
+            assign nav_label_key = 'nav_' | append: i | append: '_label'
+            assign nav_link_key = 'nav_' | append: i | append: '_link'
+            assign show_dropdown_key = 'nav_' | append: i | append: '_show_dropdown'
+
+            assign nav_enabled = block.settings[nav_enabled_key]
+            assign nav_label = block.settings[nav_label_key]
+            assign nav_link = block.settings[nav_link_key]
+            assign show_dropdown = block.settings[show_dropdown_key]
+          %}
+
+          {% if nav_enabled and nav_label != blank %}
+            <li class="ai-mega-menu-nav-item-{{ ai_gen_id }}">
+              <a
+                href="{{ nav_link }}"
+                class="ai-mega-menu-nav-link-{{ ai_gen_id }} {% if nav_label == 'Offers' %}ai-mega-menu-nav-link-offers-{{ ai_gen_id }}{% endif %}"
+              >
+                {{ nav_label }}
+              </a>
+
+              {% if show_dropdown %}
+                <div class="ai-mega-menu-dropdown-{{ ai_gen_id }}">
+                  <div class="ai-mega-menu-dropdown-inner-{{ ai_gen_id }}">
+                    {% for col in (1..4) %}
+                      {% liquid
+                        assign col_enabled_key = 'nav_' | append: i | append: '_col_' | append: col | append: '_enabled'
+                        assign col_heading_key = 'nav_' | append: i | append: '_col_' | append: col | append: '_heading'
+                        assign col_links_key = 'nav_' | append: i | append: '_col_' | append: col | append: '_links'
+
+                        assign col_enabled = block.settings[col_enabled_key]
+                        assign col_heading = block.settings[col_heading_key]
+                        assign col_links = block.settings[col_links_key]
+                      %}
+
+                      {% if col_enabled and col_heading != blank %}
+                        <div class="ai-mega-menu-dropdown-column-{{ ai_gen_id }}">
+                          <h3 class="ai-mega-menu-dropdown-heading-{{ ai_gen_id }}">{{ col_heading }}</h3>
+                          {% if col_links != blank %}
+                            <ul class="ai-mega-menu-dropdown-list-{{ ai_gen_id }}">
+                              {% assign links_array = col_links | split: ',' %}
+                              {% for link_item in links_array %}
+                                {% assign link_parts = link_item | split: '|' %}
+                                {% if link_parts.size == 2 %}
+                                  <li>
+                                    <a href="{{ link_parts[1] | strip }}" class="ai-mega-menu-dropdown-link-{{ ai_gen_id }}">
+                                      {{ link_parts[0] | strip }}
+                                    </a>
+                                  </li>
+                                {% endif %}
+                              {% endfor %}
+                            </ul>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+</mega-menu-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class MegaMenu{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.setupAccessibility();
+      }
+
+      setupAccessibility() {
+        const navItems = this.querySelectorAll('.ai-mega-menu-nav-item-{{ ai_gen_id }}');
+
+        navItems.forEach((item) => {
+          const link = item.querySelector('.ai-mega-menu-nav-link-{{ ai_gen_id }}');
+          const dropdown = item.querySelector('.ai-mega-menu-dropdown-{{ ai_gen_id }}');
+
+          if (dropdown) {
+            link.setAttribute('aria-haspopup', 'true');
+            link.setAttribute('aria-expanded', 'false');
+
+            item.addEventListener('mouseenter', () => {
+              link.setAttribute('aria-expanded', 'true');
+            });
+
+            item.addEventListener('mouseleave', () => {
+              link.setAttribute('aria-expanded', 'false');
+            });
+          }
+        });
+      }
+    }
+
+    customElements.define('mega-menu-{{ ai_gen_id }}', MegaMenu{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Mega menu navigation",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Announcement bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "Free delivery on orders over £50"
+    },
+    {
+      "type": "color",
+      "id": "announcement_bg_color",
+      "label": "Background color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "color",
+      "id": "announcement_text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "icon_hover_color",
+      "label": "Icon hover color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "color",
+      "id": "nav_bg_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "nav_text_color",
+      "label": "Text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "nav_hover_color",
+      "label": "Hover text color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "color",
+      "id": "nav_active_color",
+      "label": "Active underline color",
+      "default": "#FFE4E4"
+    },
+    {
+      "type": "color",
+      "id": "offers_text_color",
+      "label": "Offers text color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Maximum width",
+      "min": 1000,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "header",
+      "content": "Dropdown"
+    },
+    {
+      "type": "range",
+      "id": "dropdown_columns",
+      "label": "Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "dropdown_heading_color",
+      "label": "Heading color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "dropdown_link_color",
+      "label": "Link color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "dropdown_link_hover_color",
+      "label": "Link hover color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "header",
+      "content": "Navigation item 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_1_label",
+      "label": "Label",
+      "default": "Birthday"
+    },
+    {
+      "type": "url",
+      "id": "nav_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_show_dropdown",
+      "label": "Show dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_col_1_enabled",
+      "label": "Column 1 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_1_col_1_heading",
+      "label": "Column 1 heading",
+      "default": "By Age"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_1_col_1_links",
+      "label": "Column 1 links",
+      "info": "Format: Label|URL, one per line. Example: 1st Birthday|/collections/1st-birthday",
+      "default": "1st Birthday|/collections/1st-birthday, 18th Birthday|/collections/18th-birthday, 21st Birthday|/collections/21st-birthday"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_col_2_enabled",
+      "label": "Column 2 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_1_col_2_heading",
+      "label": "Column 2 heading",
+      "default": "By Recipient"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_1_col_2_links",
+      "label": "Column 2 links",
+      "default": "For Him|/collections/for-him, For Her|/collections/for-her, For Kids|/collections/for-kids"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_col_3_enabled",
+      "label": "Column 3 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_1_col_3_heading",
+      "label": "Column 3 heading",
+      "default": "Cards"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_1_col_3_links",
+      "label": "Column 3 links",
+      "default": "Funny Cards|/collections/funny-cards, Photo Cards|/collections/photo-cards, Personalised Cards|/collections/personalised-cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_1_col_4_enabled",
+      "label": "Column 4 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_1_col_4_heading",
+      "label": "Column 4 heading",
+      "default": "Gifts"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_1_col_4_links",
+      "label": "Column 4 links",
+      "default": "Gift Sets|/collections/gift-sets, Balloons|/collections/balloons, Party Supplies|/collections/party-supplies"
+    },
+    {
+      "type": "header",
+      "content": "Navigation item 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_2_label",
+      "label": "Label",
+      "default": "Cards"
+    },
+    {
+      "type": "url",
+      "id": "nav_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_show_dropdown",
+      "label": "Show dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_col_1_enabled",
+      "label": "Column 1 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_2_col_1_heading",
+      "label": "Column 1 heading",
+      "default": "Occasions"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_2_col_1_links",
+      "label": "Column 1 links",
+      "default": "Birthday Cards|/collections/birthday-cards, Thank You Cards|/collections/thank-you-cards, Congratulations|/collections/congratulations"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_col_2_enabled",
+      "label": "Column 2 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_2_col_2_heading",
+      "label": "Column 2 heading",
+      "default": "Styles"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_2_col_2_links",
+      "label": "Column 2 links",
+      "default": "Funny Cards|/collections/funny, Cute Cards|/collections/cute, Luxury Cards|/collections/luxury"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_col_3_enabled",
+      "label": "Column 3 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_2_col_3_heading",
+      "label": "Column 3 heading",
+      "default": "Personalised"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_2_col_3_links",
+      "label": "Column 3 links",
+      "default": "Photo Upload|/collections/photo-upload, Name Cards|/collections/name-cards, Custom Message|/collections/custom-message"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_2_col_4_enabled",
+      "label": "Column 4 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_2_col_4_heading",
+      "label": "Column 4 heading",
+      "default": "Multipack"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_2_col_4_links",
+      "label": "Column 4 links",
+      "default": "Card Bundles|/collections/bundles, Boxed Sets|/collections/boxed-sets, Value Packs|/collections/value-packs"
+    },
+    {
+      "type": "header",
+      "content": "Navigation item 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_3_label",
+      "label": "Label",
+      "default": "Gifts & Wrap"
+    },
+    {
+      "type": "url",
+      "id": "nav_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_show_dropdown",
+      "label": "Show dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_col_1_enabled",
+      "label": "Column 1 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_3_col_1_heading",
+      "label": "Column 1 heading",
+      "default": "Gift Wrap"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_3_col_1_links",
+      "label": "Column 1 links",
+      "default": "Wrapping Paper|/collections/wrapping-paper, Gift Bags|/collections/gift-bags, Tissue Paper|/collections/tissue-paper"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_col_2_enabled",
+      "label": "Column 2 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_3_col_2_heading",
+      "label": "Column 2 heading",
+      "default": "Accessories"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_3_col_2_links",
+      "label": "Column 2 links",
+      "default": "Ribbons & Bows|/collections/ribbons, Gift Tags|/collections/gift-tags, Stickers|/collections/stickers"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_col_3_enabled",
+      "label": "Column 3 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_3_col_3_heading",
+      "label": "Column 3 heading",
+      "default": "Small Gifts"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_3_col_3_links",
+      "label": "Column 3 links",
+      "default": "Candles|/collections/candles, Mugs|/collections/mugs, Keychains|/collections/keychains"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_3_col_4_enabled",
+      "label": "Column 4 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_3_col_4_heading",
+      "label": "Column 4 heading",
+      "default": "Gift Sets"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_3_col_4_links",
+      "label": "Column 4 links",
+      "default": "Pamper Sets|/collections/pamper, Chocolate Boxes|/collections/chocolate, Hampers|/collections/hampers"
+    },
+    {
+      "type": "header",
+      "content": "Navigation item 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_4_label",
+      "label": "Label",
+      "default": "Ornaments"
+    },
+    {
+      "type": "url",
+      "id": "nav_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_show_dropdown",
+      "label": "Show dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_col_1_enabled",
+      "label": "Column 1 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_4_col_1_heading",
+      "label": "Column 1 heading",
+      "default": "Christmas"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_4_col_1_links",
+      "label": "Column 1 links",
+      "default": "Tree Ornaments|/collections/tree-ornaments, Baubles|/collections/baubles, Stockings|/collections/stockings"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_col_2_enabled",
+      "label": "Column 2 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_4_col_2_heading",
+      "label": "Column 2 heading",
+      "default": "Seasonal"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_4_col_2_links",
+      "label": "Column 2 links",
+      "default": "Easter|/collections/easter, Halloween|/collections/halloween, Spring|/collections/spring"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_col_3_enabled",
+      "label": "Column 3 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_4_col_3_heading",
+      "label": "Column 3 heading",
+      "default": "Home Decor"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_4_col_3_links",
+      "label": "Column 3 links",
+      "default": "Figurines|/collections/figurines, Wall Art|/collections/wall-art, Plaques|/collections/plaques"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_4_col_4_enabled",
+      "label": "Column 4 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_4_col_4_heading",
+      "label": "Column 4 heading",
+      "default": "Collectibles"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_4_col_4_links",
+      "label": "Column 4 links",
+      "default": "Limited Edition|/collections/limited-edition, Keepsakes|/collections/keepsakes, Memorabilia|/collections/memorabilia"
+    },
+    {
+      "type": "header",
+      "content": "Navigation item 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_5_label",
+      "label": "Label",
+      "default": "Offers"
+    },
+    {
+      "type": "url",
+      "id": "nav_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_show_dropdown",
+      "label": "Show dropdown",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_col_1_enabled",
+      "label": "Column 1 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_5_col_1_heading",
+      "label": "Column 1 heading",
+      "default": "Current Offers"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_5_col_1_links",
+      "label": "Column 1 links",
+      "default": "Sale Items|/collections/sale, Clearance|/collections/clearance, 3 for 2|/collections/3-for-2"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_col_2_enabled",
+      "label": "Column 2 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_5_col_2_heading",
+      "label": "Column 2 heading",
+      "default": "Bundles"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_5_col_2_links",
+      "label": "Column 2 links",
+      "default": "Card Bundles|/collections/card-bundles, Gift Bundles|/collections/gift-bundles, Party Packs|/collections/party-packs"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_col_3_enabled",
+      "label": "Column 3 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_5_col_3_heading",
+      "label": "Column 3 heading",
+      "default": "Seasonal Sales"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_5_col_3_links",
+      "label": "Column 3 links",
+      "default": "Summer Sale|/collections/summer-sale, Black Friday|/collections/black-friday, Boxing Day|/collections/boxing-day"
+    },
+    {
+      "type": "checkbox",
+      "id": "nav_5_col_4_enabled",
+      "label": "Column 4 enabled",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "nav_5_col_4_heading",
+      "label": "Column 4 heading",
+      "default": "Loyalty Rewards"
+    },
+    {
+      "type": "textarea",
+      "id": "nav_5_col_4_links",
+      "label": "Column 4 links",
+      "default": "Member Exclusives|/collections/member-exclusives, Points Shop|/collections/points-shop, VIP Offers|/collections/vip-offers"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega menu navigation"
+    }
+  ]
+}
 {% endschema %}
